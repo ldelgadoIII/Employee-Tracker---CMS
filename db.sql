@@ -14,7 +14,7 @@ CREATE TABLE employee (
     PRIMARY KEY (id)
 )
 -- create role table
-CREATE TABLE employee (
+CREATE TABLE role (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(30) NULL,
     salary DECIMAL(10, 4) NULL,
@@ -22,7 +22,7 @@ CREATE TABLE employee (
     PRIMARY KEY (id)
 )
 -- create department table
-CREATE TABLE employee (
+CREATE TABLE department (
     id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(30) NULL,
     PRIMARY KEY (id)
