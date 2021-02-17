@@ -2,9 +2,22 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 
+// connect to database
+const connection = mysql.createConnection({
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "password",
+  database: "employee_trackerDB",
+});
+
+connection.connect((err) => {
+  if (err) throw err;
+  console.log(`connected as id ${connection.threadId}`);
+  //  connection.end();
+});
+
 // STARTING DATA ==========================
-// log into mysql
-// questions array
 const questions = [
   {
     name: "prompt",
@@ -27,26 +40,26 @@ const questions = [
 ];
 
 // FUNCTIONS ==============================
-// Ask user what they want to do?
 function init() {
   inquirer.prompt(questions).then((answer) => {
     switch (answer.prompt) {
       case "View All Employees":
+        viewEmployees();
         break;
-      case "View All Employees by Department":
+      case "Add Employee":
         break;
-      case "View All Employees by Manager":
+      case "Update Employee Role":
         break;
       default:
+        connection.end();
         break;
     }
   });
 }
 
-// Add departments, roles, employees
-
-// View departments, roles, employees
-
-// Update employee roles
+function viewEmployees() {
+  const query = "SELECT * FROM ?";
+  connection.query;
+}
 // USER INTERACTIONS ======================
 init();
