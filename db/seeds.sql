@@ -1,3 +1,10 @@
+ALTER TABLE employee
+ADD FOREIGN KEY (role_id) REFERENCES role (id),
+ADD FOREIGN KEY (manager_id) REFERENCES employee (id);
+
+ALTER TABLE role
+ADD FOREIGN KEY (department_id) REFERENCES department (id);
+
 INSERT INTO employee (first_name, last_name)
 VALUES ("Loreto", "Delgado"), ("Mallory", "Lutton"), ("Nicki", "Chlebek");
 
