@@ -18,6 +18,10 @@ connection.connect((err) => {
 });
 
 // STARTING DATA ==========================
+let managers;
+let managers_ids;
+let manager_obj = {};
+
 const actions = [
   {
     name: "prompt",
@@ -25,7 +29,7 @@ const actions = [
     message: "What would you like to do?",
     choices: [
       "View All Employees",
-      "View All Departments",
+      "View All managers",
       "View All Roles",
       "Add Employee",
       "Add Department",
@@ -43,8 +47,8 @@ function init() {
       case "View All Employees":
         viewEmployees();
         break;
-      case "View All Departments":
-        viewDepartments();
+      case "View All managers":
+        viewmanagers();
         break;
       case "View All Roles":
         viewRoles();
@@ -90,7 +94,7 @@ function viewEmployees() {
   });
 }
 
-function viewDepartments() {
+function viewmanagers() {
   const query = `SELECT * FROM department`;
 
   connection.query(query, (err, res) => {
@@ -110,6 +114,71 @@ function viewRoles() {
   });
 }
 
+function addDepartment() {
+  const query = `INSERT INTO department SET ?`;
+
+  inquirer
+    .prompt({
+      name: "department",
+      type: "input",
+      message: "What department would you like to add?",
+    })
+    .then((answer) => {
+      connection.query(query, { name: answer.department }, (err) => {
+        if (err) throw err;
+        console.log("You added a department!");
+        init();
+      });
+    });
+}
+
+connection.query("SELECT * FROM department", (err, res) => {
+  managers_ids = res.map((dept) => dept.id);
+  managers = res.map((dept) => dept.name);
+});
+
+function addRole() {
+  for (let i = 0; i < managers.length; i++) {
+    manager_obj[managers[i]] = managers_ids[i];
+  }
+
+  const query = `INSERT INTO role SET ?`;
+  const roleQs = [
+    {
+      name: "role",
+      type: "input",
+      message: "What role would you like to add?",
+    },
+    {
+      name: "salary",
+      type: "input",
+      message: "How much does this role make annually?",
+    },
+    {
+      name: "department",
+      type: "list",
+      message: "Which department will this be assigned to?",
+      choices: managers,
+    },
+  ];
+
+  inquirer.prompt(roleQs).then((answer) => {
+    connection.query(
+      query,
+      {
+        title: answer.role,
+        salary: answer.salary,
+        department_id: manager_obj[answer.department],
+      },
+      (err) => {
+        if (err) throw err;
+        console.log("You added a department!");
+        init();
+      }
+    );
+  });
+}
+
 const addEmployee = () => {
   const query = `SELECT *
   FROM employee AS Manager
@@ -117,8 +186,25 @@ const addEmployee = () => {
   ON role.id = Manager.id;`;
   const insertQuery = `INSERT INTO employee SET ?`;
 
+  // let managers;
+  // let managers_ids;
+  // let manager_obj = {};
+
+  // connection.query("SELECT * FROM Manager", (err, res) => {
+  //   managers_ids = res.map((dept) => dept.id);
+  //   managers = res.map((dept) => dept.name);
+  // });
+
+  // for (let i = 0; i < managers.length; i++) {
+  //   manager_obj[managers[i]] = managers_ids[i];
+  // }
+
   connection.query(query, (err, results) => {
     if (err) throw err;
+
+    connection.query("SELECT * FROM Manager", (err, res) => {
+      console.log(res);
+    });
 
     const questions = [
       {
@@ -157,21 +243,24 @@ const addEmployee = () => {
       },
     ];
 
-    inquirer.prompt(questions).then((answer) => {
-      connection.query(
-        insertQuery,
-        {
-          first_name: answer.firstName,
-          last_name: answer.lastName,
-          role_id: answer.role,
-          manager_id: answer.manager,
-        },
-        (err) => {
-          if (err) throw err;
-          console.log("New Employee Added");
-        }
-      );
-    });
+    // inquirer.prompt(questions).then((answer) => {
+    //   console.log(answer.role);
+    //   console.log(answer.manager);
+
+    // connection.query(
+    //   insertQuery,
+    //   {
+    //     first_name: answer.firstName,
+    //     last_name: answer.lastName,
+    //     role_id: answer.role,
+    //     manager_id: answer.manager,
+    //   },
+    //   (err) => {
+    //     if (err) throw err;
+    //     console.log("New Employee Added");
+    //   }
+    // );
+    // });
   });
   // viewEmployees();
   // init();
