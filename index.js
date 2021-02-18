@@ -30,6 +30,10 @@ let roles;
 let roles_ids;
 let role_obj = {};
 
+let employees;
+let employee_ids;
+let employee_obj = {};
+
 const actions = [
   {
     name: "prompt",
@@ -259,10 +263,6 @@ const addEmployee = () => {
   });
 };
 
-let employees;
-let employee_ids;
-let employee_obj = {};
-
 connection.query("SELECT * FROM employee", (err, res) => {
   employee_ids = res.map((element) => element.role_id);
   employees = res.map((element) => element.first_name);
@@ -309,5 +309,23 @@ function updateRole() {
     );
   });
 }
+
+function welcomeMessage() {
+  console.log(`
+                                     
+  _____           _                   
+ |   __|_____ ___| |___ _ _ ___ ___   
+ |   __|     | . | | . | | | -_| -_|  
+ |_____|_|_|_|  _|_|___|_  |___|___|  
+             |_|       |___|          
+                                      
+  _____                               
+ |     |___ ___ ___ ___ ___ ___       
+ | | | | .'|   | .'| . | -_|  _|      
+ |_|_|_|__,|_|_|__,|_  |___|_|        
+                   |___|              
+ `);
+}
 // USER INTERACTIONS ======================
+welcomeMessage();
 init();
