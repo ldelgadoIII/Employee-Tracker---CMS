@@ -22,6 +22,7 @@ Node is required for this application to work. The user must also install mysql 
 ## Usage
 
 In addition to running the application using npm start, the user must run the schema and seeds files within the database folder in mysql.
+
 ![README Gif](assets/cms_demo.gif)
 
 ## License
