@@ -90,6 +90,26 @@ function viewEmployees() {
   });
 }
 
+function viewDepartments() {
+  const query = `SELECT * FROM department`;
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    init();
+  });
+}
+
+function viewRoles() {
+  const query = `SELECT role.title AS Role FROM role`;
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    init();
+  });
+}
+
 const addEmployee = () => {
   const query = `SELECT *
   FROM employee AS Manager
