@@ -18,6 +18,18 @@ connection.connect((err) => {
 });
 
 // STARTING DATA ==========================
+let departments;
+let dept_ids;
+let dept_obj = {};
+
+let managers;
+let managers_ids;
+let manager_obj = {};
+
+let roles;
+let roles_ids;
+let role_obj = {};
+
 const actions = [
   {
     name: "prompt",
@@ -128,10 +140,6 @@ function addDepartment() {
     });
 }
 
-let departments;
-let dept_ids;
-let dept_obj = {};
-
 connection.query("SELECT * FROM department", (err, res) => {
   dept_ids = res.map((dept) => dept.id);
   departments = res.map((dept) => dept.name);
@@ -179,18 +187,10 @@ function addRole() {
   });
 }
 
-let managers;
-let managers_ids;
-let manager_obj = {};
-
 connection.query("SELECT * FROM employee", (err, res) => {
-  managers_ids = res.map((element) => element.manager_id);
+  managers_ids = res.map((element) => element.id);
   managers = res.map((element) => element.first_name);
 });
-
-let roles;
-let roles_ids;
-let role_obj = {};
 
 connection.query("SELECT * FROM role", (err, res) => {
   roles_ids = res.map((element) => element.department_id);
@@ -241,9 +241,6 @@ const addEmployee = () => {
     ];
 
     inquirer.prompt(questions).then((answer) => {
-      // console.log(role_obj[answer.role]);
-      // console.log(manager_obj[answer.manager]);
-
       connection.query(
         insertQuery,
         {
@@ -261,5 +258,56 @@ const addEmployee = () => {
     });
   });
 };
+
+let employees;
+let employee_ids;
+let employee_obj = {};
+
+connection.query("SELECT * FROM employee", (err, res) => {
+  employee_ids = res.map((element) => element.role_id);
+  employees = res.map((element) => element.first_name);
+});
+
+function updateRole() {
+  for (let i = 0; i < employees.length; i++) {
+    employee_obj[employees[i]] = employee_ids[i];
+  }
+
+  for (let i = 0; i < roles.length; i++) {
+    role_obj[roles[i]] = roles_ids[i];
+  }
+
+  const updateQs = [
+    {
+      name: "employee",
+      type: "list",
+      message: "Which employee's role would you like to change?",
+      choices: employees,
+    },
+    {
+      name: "role",
+      type: "list",
+      message: "Which role would you like to assign?",
+      choices: roles,
+    },
+  ];
+
+  for (let i = 0; i < roles.length; i++) {
+    role_obj[roles[i]] = roles_ids[i];
+  }
+
+  inquirer.prompt(updateQs).then((answer) => {
+    connection.query(
+      `UPDATE employee
+    SET first_name = '${answer.employee}', role_id = ${role_obj[answer.role]}
+    WHERE role_id = ${employee_obj[answer.employee]};`,
+      (err, res) => {
+        if (err) throw err;
+        console.log("Role has been updated!");
+        init();
+      }
+    );
+  });
+}
 // USER INTERACTIONS ======================
 init();
