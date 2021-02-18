@@ -9,12 +9,6 @@ VALUES ("Web Developer", 80000, 1), ("Sales Lead", 70000, 2), ("Accountant", 600
 INSERT INTO department (name)
 VALUES ("Engineering"), ("Sales"), ("Finance");
 
--- View Values
-
-SELECT * FROM employee;
-SELECT * FROM role;
-SELECT * FROM department;
-
 -- View all employees feature
 SELECT employee.first_name AS "First Name", 
 employee.last_name AS "Last Name", 
@@ -29,3 +23,10 @@ LEFT JOIN employee AS Manager
 ON employee.manager_id = Manager.id
 LEFT JOIN department
 ON role.department_id = department.id;
+
+-- Select manager and role tables
+SELECT role.title, 
+Manager.first_name
+FROM employee AS Manager
+LEFT JOIN role
+ON role.id = Manager.id;
