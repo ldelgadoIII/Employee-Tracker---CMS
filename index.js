@@ -18,10 +18,6 @@ connection.connect((err) => {
 });
 
 // STARTING DATA ==========================
-let managers;
-let managers_ids;
-let manager_obj = {};
-
 const actions = [
   {
     name: "prompt",
@@ -132,9 +128,13 @@ function addDepartment() {
     });
 }
 
+let departments;
+let dept_ids;
+let dept_obj = {};
+
 connection.query("SELECT * FROM department", (err, res) => {
-  managers_ids = res.map((dept) => dept.id);
-  managers = res.map((dept) => dept.name);
+  dept_ids = res.map((dept) => dept.id);
+  departments = res.map((dept) => dept.name);
 });
 
 function addRole() {
@@ -158,7 +158,7 @@ function addRole() {
       name: "department",
       type: "list",
       message: "Which department will this be assigned to?",
-      choices: managers,
+      choices: departments,
     },
   ];
 
@@ -168,7 +168,7 @@ function addRole() {
       {
         title: answer.role,
         salary: answer.salary,
-        department_id: manager_obj[answer.department],
+        department_id: dept_obj[answer.department],
       },
       (err) => {
         if (err) throw err;
@@ -179,6 +179,24 @@ function addRole() {
   });
 }
 
+let managers;
+let managers_ids;
+let manager_obj = {};
+
+connection.query("SELECT * FROM employee", (err, res) => {
+  managers_ids = res.map((element) => element.manager_id);
+  managers = res.map((element) => element.first_name);
+});
+
+let roles;
+let roles_ids;
+let role_obj = {};
+
+connection.query("SELECT * FROM role", (err, res) => {
+  roles_ids = res.map((element) => element.department_id);
+  roles = res.map((element) => element.title);
+});
+
 const addEmployee = () => {
   const query = `SELECT *
   FROM employee AS Manager
@@ -186,25 +204,16 @@ const addEmployee = () => {
   ON role.id = Manager.id;`;
   const insertQuery = `INSERT INTO employee SET ?`;
 
-  // let managers;
-  // let managers_ids;
-  // let manager_obj = {};
+  for (let i = 0; i < managers.length; i++) {
+    manager_obj[managers[i]] = managers_ids[i];
+  }
 
-  // connection.query("SELECT * FROM Manager", (err, res) => {
-  //   managers_ids = res.map((dept) => dept.id);
-  //   managers = res.map((dept) => dept.name);
-  // });
-
-  // for (let i = 0; i < managers.length; i++) {
-  //   manager_obj[managers[i]] = managers_ids[i];
-  // }
+  for (let i = 0; i < roles.length; i++) {
+    role_obj[roles[i]] = roles_ids[i];
+  }
 
   connection.query(query, (err, results) => {
     if (err) throw err;
-
-    connection.query("SELECT * FROM Manager", (err, res) => {
-      console.log(res);
-    });
 
     const questions = [
       {
@@ -221,49 +230,36 @@ const addEmployee = () => {
         name: "role",
         type: "rawlist",
         message: "What is the employees role?",
-        choices() {
-          const choiceArray = [];
-          results.forEach(({ title }) => {
-            choiceArray.push(title);
-          });
-          return choiceArray;
-        },
+        choices: roles,
       },
       {
         name: "manager",
         type: "rawlist",
         message: "Who is the employees manager?",
-        choices() {
-          const choiceArray = [];
-          results.forEach(({ first_name }) => {
-            choiceArray.push(first_name);
-          });
-          return choiceArray;
-        },
+        choices: managers,
       },
     ];
 
-    // inquirer.prompt(questions).then((answer) => {
-    //   console.log(answer.role);
-    //   console.log(answer.manager);
+    inquirer.prompt(questions).then((answer) => {
+      // console.log(role_obj[answer.role]);
+      // console.log(manager_obj[answer.manager]);
 
-    // connection.query(
-    //   insertQuery,
-    //   {
-    //     first_name: answer.firstName,
-    //     last_name: answer.lastName,
-    //     role_id: answer.role,
-    //     manager_id: answer.manager,
-    //   },
-    //   (err) => {
-    //     if (err) throw err;
-    //     console.log("New Employee Added");
-    //   }
-    // );
-    // });
+      connection.query(
+        insertQuery,
+        {
+          first_name: answer.firstName,
+          last_name: answer.lastName,
+          role_id: role_obj[answer.role],
+          manager_id: manager_obj[answer.manager],
+        },
+        (err) => {
+          if (err) throw err;
+          console.log("New Employee Added");
+          init();
+        }
+      );
+    });
   });
-  // viewEmployees();
-  // init();
 };
 // USER INTERACTIONS ======================
 init();
