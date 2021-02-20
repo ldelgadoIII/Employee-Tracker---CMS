@@ -25,6 +25,8 @@ In addition to running the application using npm start, the user must run the sc
 
 ![README Gif](assets/cms_demo.gif)
 
+Visit Demonstration: https://youtu.be/O5DKhTnk6gM
+
 ## License
 
 This application is covered by the Creative Commons license.
